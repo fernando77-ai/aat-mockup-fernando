@@ -275,6 +275,17 @@
     color: var(--ink);
   }
 
+  footer .contact-line a {
+    color: var(--gold-deep);
+    text-decoration: none;
+    border-bottom: 1px solid var(--tan);
+  }
+
+  footer .contact-line a:hover,
+  footer .contact-line a:focus-visible {
+    border-bottom-color: var(--gold-deep);
+  }
+
   @media (max-width: 760px) {
     .hero-grid {
       grid-template-columns: 1fr;
@@ -293,6 +304,10 @@
     }
     .hero {
       padding: 72px 0 64px;
+    }
+    footer .wrap {
+      flex-direction: column;
+      align-items: flex-start;
     }
   }
 
@@ -321,7 +336,7 @@
       <div>
         <div class="hero-eyebrow-rule"></div>
         <h1>El CFO personal que le falta a tu negocio</h1>
-        <p class="hero-sub">FinCopa traduce lo que pasa en la Fed y Banxico a decisiones concretas para tu bolsillo, calcula tu patrimonio real y te avisa antes de que el dinero se te escape.</p>
+        <p class="hero-sub">Entiende cómo la economía afecta tu dinero y toma mejores decisiones con tu dinero: FinCopa traduce lo que hacen la Fed y Banxico a lo que significa para tu caso, en español simple.</p>
         <a href="#herramientas" class="btn-primary">Ver herramientas</a>
       </div>
       <div class="hero-panel">
@@ -369,6 +384,7 @@
 <footer id="contacto">
   <div class="wrap">
     <span class="brand-mini">FinCopa</span>
+    <p class="contact-line">Contacto: <a href="mailto:jf777silva@gmail.com">jf777silva@gmail.com</a></p>
     <p>&copy; 2026 FinCopa. Todos los derechos reservados.</p>
   </div>
 </footer>
