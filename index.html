@@ -286,6 +286,94 @@
     border-bottom-color: var(--gold-deep);
   }
 
+  /* --- Cuenta (registro e inicio de sesión) --- */
+
+  .account {
+    padding: 88px 0 100px;
+    border-top: 1px solid var(--tan);
+  }
+
+  .account h2 {
+    font-family: var(--serif);
+    font-size: clamp(1.8rem, 3vw, 2.3rem);
+    margin: 0 0 14px;
+  }
+
+  .account .account-intro {
+    color: var(--ink-soft);
+    margin: 0 0 40px;
+    max-width: 56ch;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 28px;
+  }
+
+  .form-card {
+    background: var(--paper);
+    border-top: 3px solid var(--gold);
+    padding: 28px 26px 30px;
+    box-shadow: 0 1px 0 var(--tan);
+  }
+
+  .form-card h3 {
+    font-family: var(--serif);
+    font-size: 1.28rem;
+    margin: 0 0 16px;
+  }
+
+  .form-card label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--ink-soft);
+    margin-bottom: 14px;
+  }
+
+  .form-card input {
+    display: block;
+    width: 100%;
+    margin-top: 6px;
+    padding: 11px 12px;
+    font: inherit;
+    color: var(--ink);
+    background: #fff;
+    border: 1px solid var(--tan);
+  }
+
+  .form-msg {
+    min-height: 1.4em;
+    margin: 4px 0 14px;
+    font-size: 0.92rem;
+    color: var(--coral);
+  }
+
+  .form-msg.ok { color: var(--gold-deep); }
+
+  .session-box {
+    background: var(--paper);
+    border-top: 3px solid var(--gold);
+    padding: 28px 26px 30px;
+    box-shadow: 0 1px 0 var(--tan);
+    max-width: 480px;
+  }
+
+  .session-box p {
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    margin: 0 0 18px;
+  }
+
+  @media (max-width: 760px) {
+    .form-grid { grid-template-columns: 1fr; }
+    footer .wrap {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+
   @media (max-width: 760px) {
     .hero-grid {
       grid-template-columns: 1fr;
@@ -304,10 +392,6 @@
     }
     .hero {
       padding: 72px 0 64px;
-    }
-    footer .wrap {
-      flex-direction: column;
-      align-items: flex-start;
     }
   }
 
@@ -379,6 +463,46 @@
       </div>
     </div>
   </section>
+  <section id="cuenta" class="account">
+    <div class="wrap">
+      <h2>Tu cuenta</h2>
+      <p class="account-intro">Crea tu cuenta para guardar tu progreso en FinCopa y volver a él desde cualquier dispositivo.</p>
+
+      <div id="forms" class="form-grid">
+        <form id="form-registro" class="form-card" novalidate>
+          <h3>Crear cuenta</h3>
+          <label>Nombre
+            <input type="text" id="reg-nombre" autocomplete="name" required>
+          </label>
+          <label>Correo
+            <input type="email" id="reg-correo" autocomplete="email" required>
+          </label>
+          <label>Contraseña (mínimo 6 caracteres)
+            <input type="password" id="reg-pass" autocomplete="new-password" minlength="6" required>
+          </label>
+          <p class="form-msg" id="msg-registro" role="alert"></p>
+          <button type="submit" class="btn-primary">Registrarme</button>
+        </form>
+
+        <form id="form-login" class="form-card" novalidate>
+          <h3>Iniciar sesión</h3>
+          <label>Correo
+            <input type="email" id="login-correo" autocomplete="email" required>
+          </label>
+          <label>Contraseña
+            <input type="password" id="login-pass" autocomplete="current-password" required>
+          </label>
+          <p class="form-msg" id="msg-login" role="alert"></p>
+          <button type="submit" class="btn-primary">Entrar</button>
+        </form>
+      </div>
+
+      <div id="session" class="session-box" hidden>
+        <p id="saludo"></p>
+        <button type="button" id="btn-salir" class="btn-primary">Cerrar sesión</button>
+      </div>
+    </div>
+  </section>
 </main>
 
 <footer id="contacto">
@@ -388,6 +512,90 @@
     <p>&copy; 2026 FinCopa. Todos los derechos reservados.</p>
   </div>
 </footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+  // Solo la publishable (anon) key: es pública y la protege RLS en la tabla perfiles.
+  const SUPABASE_URL = "https://pppeofqgriylhoydwbfl.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBwcGVvZnFncml5bGhveWR3YmZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ0MjkzNjMsImV4cCI6MjExMDAwNTM2M30.tvGzGTutgaKTfu0hw9sX5pBY3HeoFydXwdc0F7PLtmU";
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  const $ = (id) => document.getElementById(id);
+  const forms = $("forms");
+  const sessionBox = $("session");
+
+  function setMsg(id, text, ok) {
+    const el = $(id);
+    el.textContent = text || "";
+    el.classList.toggle("ok", !!ok);
+  }
+
+  function traducir(error) {
+    const m = (error && error.message ? error.message : "").toLowerCase();
+    if (m.includes("already registered")) return "Ese correo ya está registrado.";
+    if (m.includes("password") && m.includes("6")) return "La contraseña debe tener al menos 6 caracteres.";
+    if (m.includes("invalid login")) return "Correo o contraseña incorrectos.";
+    if (m.includes("valid email") || m.includes("invalid email")) return "Escribe un correo válido.";
+    return "No se pudo completar: " + (error && error.message ? error.message : "error desconocido");
+  }
+
+  async function mostrarSesion(session, nombreRespaldo) {
+    if (!session) {
+      sessionBox.hidden = true;
+      forms.hidden = false;
+      return;
+    }
+    let nombre = nombreRespaldo;
+    const { data } = await sb.from("perfiles").select("nombre").eq("id", session.user.id).maybeSingle();
+    if (data && data.nombre) nombre = data.nombre;
+    $("saludo").textContent = "Hola, " + (nombre || session.user.email);
+    forms.hidden = true;
+    sessionBox.hidden = false;
+  }
+
+  $("form-registro").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    setMsg("msg-registro", "");
+    const nombre = $("reg-nombre").value.trim();
+    const correo = $("reg-correo").value.trim();
+    const pass = $("reg-pass").value;
+    if (!nombre || !correo) return setMsg("msg-registro", "Completa nombre y correo.");
+    if (pass.length < 6) return setMsg("msg-registro", "La contraseña debe tener al menos 6 caracteres.");
+
+    const { data, error } = await sb.auth.signUp({ email: correo, password: pass });
+    if (error) return setMsg("msg-registro", traducir(error));
+    if (!data.user || (data.user.identities && data.user.identities.length === 0)) {
+      return setMsg("msg-registro", "Ese correo ya está registrado.");
+    }
+    if (!data.session) {
+      return setMsg("msg-registro", "Revisa tu correo para confirmar tu cuenta.", true);
+    }
+    const { error: errPerfil } = await sb.from("perfiles").insert({ id: data.user.id, nombre: nombre });
+    if (errPerfil) setMsg("msg-registro", "Tu cuenta se creó, pero no se pudo guardar tu nombre: " + errPerfil.message);
+    await mostrarSesion(data.session, nombre);
+    $("form-registro").reset();
+  });
+
+  $("form-login").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    setMsg("msg-login", "");
+    const correo = $("login-correo").value.trim();
+    const pass = $("login-pass").value;
+    if (!correo || !pass) return setMsg("msg-login", "Escribe tu correo y tu contraseña.");
+    const { data, error } = await sb.auth.signInWithPassword({ email: correo, password: pass });
+    if (error) return setMsg("msg-login", traducir(error));
+    await mostrarSesion(data.session);
+    $("form-login").reset();
+  });
+
+  $("btn-salir").addEventListener("click", async () => {
+    await sb.auth.signOut();
+    await mostrarSesion(null);
+  });
+
+  // Al recargar, recupera la sesión guardada.
+  sb.auth.getSession().then(({ data }) => mostrarSesion(data.session));
+</script>
 
 </body>
 </html>
