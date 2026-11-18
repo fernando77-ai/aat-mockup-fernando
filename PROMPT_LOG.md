@@ -24,7 +24,7 @@ Origen: la propuso Claude Code. Fernando la aceptó y siguió con ella (2026-11-
 
 **2026-11-17 · Revisar · (entrega).** La subida inicial quedó con el nombre `index.html.html`, así que Vercel seguía sirviendo la versión anterior. Se borró el `index.html` viejo y se renombró `index.html.html` a `index.html` (2 commits). Después se confirmó en el sitio en vivo: sección `#lecciones` con 3 tarjetas y el texto "Inicia sesión en «Tu cuenta» para guardar tu avance".
 
-**2026-11-17 · Aceptar · (texto de la página).** Claude Code cambió el texto principal de la página (hero) sin que se le pidiera. Fernando decidió dejarlo.
+
 
 ## 3. Validación (Paso 3)
 
