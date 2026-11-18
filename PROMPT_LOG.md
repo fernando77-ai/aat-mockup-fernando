@@ -39,7 +39,7 @@ Fecha: 2026-11-17 · Sitio en vivo: https://aat-mockup-fernando.vercel.app · Us
 
 **Output real:** captura de pantalla tras volver a entrar. Texto en pantalla: "Llevas 1 de 3 lecciones". La lección 2 muestra "✓ Completada" y el botón "Desmarcar". Las lecciones 1 y 3 muestran el botón "Marcar como completada".
 
-**Veredicto: pasa.** El avance se guardó en Supabase y no solo en la pantalla, porque sobrevivió al cierre de sesión. Coincide con el campo "cómo se sabrá que funciona" de la especificación.
+**Veredicto: Aceptar.** El avance se guardó en Supabase y no solo en la pantalla, porque sobrevivió al cierre de sesión. Coincide con el campo "cómo se sabrá que funciona" de la especificación.
 
 ### Caso B: marcar las 3 lecciones
 
@@ -47,7 +47,7 @@ Fecha: 2026-11-17 · Sitio en vivo: https://aat-mockup-fernando.vercel.app · Us
 
 **Output real:** captura de pantalla. Texto: "Llevas 3 de 3 lecciones". Las 3 tarjetas muestran "✓ Completada" y el botón "Desmarcar".
 
-**Veredicto: pasa.** El conteo se actualiza al marcar.
+**Veredicto: Aceptar.** El conteo se actualiza al marcar.
 
 ### Caso C: otro usuario no ve el avance de A
 
@@ -55,7 +55,7 @@ Fecha: 2026-11-17 · Sitio en vivo: https://aat-mockup-fernando.vercel.app · Us
 
 **Output real:** Fernando confirmó el 2026-11-17 que, al entrar con otro usuario existente y con su contraseña correcta, la página mostró "Llevas 0 de 3 lecciones" y ninguna lección marcada, aunque A tenía 3 completadas. (Resultado reportado por Fernando, sin captura.)
 
-**Veredicto: pasa.** Con RLS cada usuario ve solo su propio avance.
+**Veredicto: Aceptar.** Con RLS cada usuario ve solo su propio avance.
 
 ## 4. Uso de IA
 
