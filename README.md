@@ -46,12 +46,19 @@ IS = sistema inteligente (Claude Code y el asistente de chat).
 - **Qué decidí:** aceptar. En el repo solo aparece la clave anon, y las tablas `perfiles` y `progreso` tienen RLS activado.
 - **Por qué:** el repositorio es público y cualquier visitante puede ver el código fuente de la página, así que todo lo que esté en `index.html` es público. La clave anon solo puede hacer lo que permiten las políticas RLS (cada usuario, solo sus filas). `service_role` se salta RLS: si estuviera en el código, cualquiera podría leer y borrar todas las tablas.
 
+### 5. Políticas RLS que recalculan `auth.uid()` por fila (seguridad y escalabilidad) — Revisé
+
+- **Qué propuso el IS:** Claude Code escribió las 3 políticas de `progreso` con `auth.uid() = usuario_id`. Las de `perfiles` ya usaban `(select auth.uid())`. Al comparar las dos tablas, el asistente de chat señaló la diferencia; yo decidí si actuar (el IS no la corrigió por su cuenta).
+- **Qué decidí:** cambiar las 3 políticas de `progreso` a `(select auth.uid()) = usuario_id`. Corrí en el editor SQL de Supabase un `drop policy` + `create policy` de las 3 dentro de una transacción (el editor pidió confirmar por ser operación destructiva) y verifiqué en `pg_policies` que quedaron las 3, con los mismos roles (`authenticated`) y la misma condición, ahora con `select`. El archivo `sql/01_progreso.sql` del repo quedó actualizado igual.
+- **Por qué:** sin el `select`, Postgres puede evaluar `auth.uid()` una vez por cada fila revisada; con el `select`, lo calcula una vez por consulta. Hoy `progreso` tiene pocas filas y no se nota, pero es la tabla que más crece (hasta 3 filas por usuario) y el cambio no cambia quién puede ver qué: la seguridad es la misma, solo se evita un costo que crece con los datos. Verificación en el sitio en vivo (25 de noviembre de 2026, con la sesión de mi usuario de prueba, ejecutada por el asistente de chat en mi navegador): el conteo leído con la política nueva fue "1 de 3"; al marcar la lección 1 y recargar la página apareció "2 de 3" con la lección 1 completada (insert y select funcionan); al desmarcarla volvió a "1 de 3" sin error (delete funciona). Quedó el mismo estado que antes de la prueba. No repetí con un segundo usuario, así que el aislamiento entre usuarios sigue respaldado por el caso C del Assignment 2.
+
 ## Qué pasa si crece o alguien la usa de forma indebida
 
 - **Datos de otros usuarios:** protegidos por RLS en la base de datos, no por el JavaScript de la página. Alguien que modifique el código en su navegador sigue sin poder leer ni escribir filas ajenas.
 - **Crecimiento:** `progreso` tiene como máximo 3 filas por usuario y su llave primaria empieza por `usuario_id`, así que consultar el avance de un usuario no recorre toda la tabla. El proyecto de Supabase está en el plan gratuito; si crece, ese plan es el primer límite.
 - **Cuentas falsas:** la confirmación de correo está desactivada para poder probar rápido, así que alguien podría registrar muchas cuentas con correos inventados. Hoy el freno son los límites por defecto de Supabase Auth. Antes de abrirla al público habría que activar la confirmación de correo.
-- **Pendiente de mejorar:** las políticas de `progreso` usan `auth.uid()` directamente; las de `perfiles` usan `(select auth.uid())`, que Supabase recomienda para que el valor se calcule una vez por consulta y no una vez por fila. Con pocos datos no se nota, y es el cambio que haría primero si la tabla crece.
+- **Ya corregido:** las políticas de `progreso` ahora usan `(select auth.uid())`, igual que las de `perfiles` (decisión 5).
+- **Pendiente de mejorar:** activar la confirmación de correo antes de abrir la app al público.
 
 ## Mensajes de commit genéricos y la decisión detrás
 
